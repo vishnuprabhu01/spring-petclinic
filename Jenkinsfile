@@ -26,4 +26,3 @@ pipeline{
 
 }
 
-https://github.com/vishnuprabhu01/spring-petclinic.git
