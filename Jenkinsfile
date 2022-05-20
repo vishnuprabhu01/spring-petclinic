@@ -1,5 +1,5 @@
 pipeline{
-    agent {label 'JDK11'}
+    agent {label 'mvn3.0.5'}
     stages{
         stage('clone the git repo'){
             steps{
