@@ -1,5 +1,7 @@
 pipeline{
     agent {label 'mvn_new1'}
+    triggers {  pollSCM '*/30 * * * *'}
+    parameters {  string defaultValue: 'package', description: 'select the goal', name: 'goal'}
     stages{
         stage('clone the git repo'){
             steps{
