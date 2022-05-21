@@ -1,5 +1,5 @@
 pipeline{
-    agent {label 'mvn3.0.5'}
+    agent {label 'mvn_new1'}
     stages{
         stage('clone the git repo'){
             steps{
@@ -8,7 +8,7 @@ pipeline{
         }
         stage('build the code') {
             steps{
-                sh 'mvn package'
+                sh 'mvn clean package'
             }
         }
         stage('run the junit test'){
