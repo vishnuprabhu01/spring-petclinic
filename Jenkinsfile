@@ -8,23 +8,48 @@ pipeline{
                 git branch: 'main', url: 'https://github.com/vishnuprabhu01/spring-petclinic.git'
             }
         }
+    
         stage('build the code') {
             steps{
-                sh 'mvn clean package'
-            }
+                withSonarQubeEnv('SONAR_MAIN') {
+               sh 'mvn clean package sonar:sonar'
+                           }
+            }             
         }
-        stage('run the junit test'){
-            steps{
-                junit '**/*/*.xml'
-            }
-        }
-        stage('Archive the artifacts'){
-            steps{
-                archiveArtifacts artifacts: '**/*.jar', followSymlinks: false
-            }
-        }
+          stage('Artifactory-Configuration') {
+            steps {
+                rtMavenDeployer (
+                    id: 'spc-deployer',
+                    serverId: 'JROG_NEW',
+                    releaseRepo: 'springpetclinic-libs-release-local',
+                    snapshotRepo: 'springpetcinic-libs-snapshot-local',
 
+                )
+            }
+        }
+        stage('Build the Code and sonarqube-analysis') {
+            steps {
+
+                rtMavenRun (
+                    // Tool name from Jenkins configuration.
+                    tool: 'mvn_new1',
+                    pom: 'pom.xml',
+                    goals: 'clean install',
+                    // Maven options.
+                    deployerId: 'spc-deployer',
+                )
+
+            }
+        }
+        stage('quality gate'){
+            steps{
+                timeout(time: 1, unit: 'HOURS') {
+                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    waitForQualityGate abortPipeline: true
+            }
+        }
+        }       
     }
-
 }
 
